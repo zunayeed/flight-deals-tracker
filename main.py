@@ -1,14 +1,22 @@
+import requests
+import serpapi
+import datetime
+import time
 #This file will need to use the DataManager,FlightSearch, FlightData, NotificationManager classes to achieve the program requirements.
 # Check second commit
 # Skeleton snippet of execution loop in main.py
 from data_manager import DataManager
 from flight_search import FlightSearch
 from notification_manager import NotificationManager
-import requests
+
 
 # Replace with your Sheety endpoint URL
 # Format: https://api.sheety.co/YOUR_USERNAME/YOUR_PROJECT_NAME/YOUR_SHEET_NAME
 SHEETY_ENDPOINT = "https://api.sheety.co/3bf8f403b513b361bbb26ef0ccfd53bd/flightPrices/sheet1"
+SERPAPI_KEY = "0da89cc1ad1aad2ce8410c00e1ae216d7c9f47e9f35360983b270db9128f7097"  # Replace with your actual SerpAPI key
+DEPARTURE_CITY = "DFW"  # Your origin IATA code (e.g., LON for London)
+CURRENCY = "USD"  # Currency code (e.g., USD, GBP, EUR)
+
 
 # If your Sheety API requires authentication (Bearer Token)
 """
@@ -16,10 +24,30 @@ headers = {
     "Authorization": "Bearer YOUR_SHEETY_BEARER_TOKEN"
 }
 """
+# 1. Fetch cities and IATA codes from Sheety
 response = requests.get(SHEETY_ENDPOINT)
 response.raise_for_status()
 data = response.json().get("sheet1", [])
 print(data ) # Adjust the key based on your sheet name in Sheety
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 """
 
