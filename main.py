@@ -33,7 +33,7 @@ sheet_data = response.json().get("sheet1", [])
 # 2. Define date range: Tomorrow -> 6 months (180 days) later
 today = datetime.date.today()
 start_date = today + datetime.timedelta(days=1)
-end_date = start_date + datetime.timedelta(days=180)
+end_date = start_date + datetime.timedelta(days=2)
 #print(start_date, end_date)
 
 # Function to generate daily dates
@@ -73,7 +73,6 @@ for destination in sheet_data:
         }
 
         try:
-            #flight_res = requests.get("https://serpapi.com/search.json", params=params)
             flight_res = requests.get("https://serpapi.com/search?engine=google_flights", params=params)
             data = flight_res.json()
 
@@ -118,60 +117,3 @@ print(cheapest_prices)
 
 
 
-
-"""
-
-class DataManager:
-    def __init__(self):
-        self.destination_data = {}
-
-    def get_destination_data(self):
-        #Sends a GET request to the Sheety API to fetch sheet rows.
-        response = requests.get(url=SHEETY_ENDPOINT, headers=headers)
-        response.raise_for_status()  # Raises an exception if the HTTP request failed
-
-        data = response.json()
-
-        # Sheety nests the returned JSON under the lowerCamelCase name of the sheet (e.g., 'prices')
-        # Adjust 'prices' to match your sheet name key in the response JSON
-        self.destination_data = data.get("prices", [])
-        return self.destination_data
-
-
-# --- Example Usage ---
-if __name__ == "__main__":
-    data_manager = DataManager()
-    sheet_data = data_manager.get_destination_data()
-
-    # Iterate through each row and print city + IATA code
-    for row in sheet_data:
-        city = row.get("city")
-        iata_code = row.get("iataCode")  # Sheety camelCases column headers (e.g., 'IATA Code' -> 'iataCode')
-        print(f"City: {city} | IATA Code: {iata_code}")
-
-
-"""
-
-
-
-"""
-data_mgr = DataManager()
-flight_search = FlightSearch()
-notifier = NotificationManager()
-
-sheet_data = data_mgr.get_destination_data()
-
-for row in sheet_data:
-    flight = flight_search.check_flights(
-        origin_city_code="LON",
-        destination_city_code=row["iataCode"],
-        from_time=tomorrow,
-        to_time=six_months_later
-    )
-    if flight and flight.price < row["lowestPrice"]:
-        notifier.send_sms(
-            message=f"Low price alert! Only £{flight.price} to fly from {flight.origin_airport} to {flight.destination_airport}!"
-        )
-
-
-"""
