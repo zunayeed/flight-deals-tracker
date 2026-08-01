@@ -32,10 +32,16 @@ CURRENCY = "USD"
 data_manager = DataManager()
 sheet_data = data_manager.get_destination_data()
 
-
 # 5. Try importing pretty print and printing the data out again using pprint() to see it formatted.
 # Print the sheet_data and verify that it includes the airport IATA codes for each city.
 pprint(sheet_data)
+
+
+flight_search = FlightSearch()
+# Create an instance of the NotificationManager
+notification_manager = NotificationManager()
+
+
 
 
 
@@ -50,7 +56,7 @@ end_date = start_date + timedelta(days=20)
 
 # ==================== Do a Flight Search ====================
 
-flight_search = FlightSearch()
+
 
 flights = flight_search.check_flights(
     origin_city_code="DFW",
@@ -69,6 +75,17 @@ pprint(f"{sheet_data[0]['city']}: USD {cheapest_flight.price}")
 if cheapest_flight.price != "N/A" and cheapest_flight.price < sheet_data[0]["lowestPrice"]:
     pprint(f"Lower price flight found to {sheet_data[0]['city']}!")
     data_manager.update_lowest_price(sheet_data[0]["id"], cheapest_flight.price)
+    # notification_manager.send_sms(
+    #     message_body=f"Low price alert! Only GBP {cheapest_flight.price} to fly "
+    #                  f"from {cheapest_flight.origin_airport} to {cheapest_flight.destination_airport}, "
+    #                  f"on {cheapest_flight.out_date} until {cheapest_flight.return_date}."
+    # )
+    # SMS not working? Try whatsapp instead.
+    # notification_manager.send_whatsapp(
+    #     message_body=f"Low price alert! Only GBP {cheapest_flight.price} to fly "
+    #                  f"from {cheapest_flight.origin_airport} to {cheapest_flight.destination_airport}, "
+    #                  f"on {cheapest_flight.out_date} until {cheapest_flight.return_date}."
+    # )
 
 
 
