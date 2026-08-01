@@ -1,3 +1,4 @@
+# only testing purpose
 from pprint import pprint
 all_flights =  [{'airline_logo': 'https://www.gstatic.com/flights/airline_logos/70px/EK.png',
                   'carbon_emissions': {'difference_percent': 27,
