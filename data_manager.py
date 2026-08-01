@@ -1,3 +1,40 @@
+import os
+import requests
+from requests.auth import HTTPBasicAuth
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+SHEETY_PRICES_ENDPOINT = "https://api.sheety.co/3bf8f403b513b361bbb26ef0ccfd53bd/flightPrices/sheet1"
+
+
 class DataManager:
-    #This class is responsible for talking to the Google Sheet.
-    pass
+
+    def __init__(self):
+        self._user = os.environ["SHEETY_USERNAME"]
+        self._password = os.environ["SHEETY_PASSWORD"]
+        self._authorization = HTTPBasicAuth(self._user, self._password)
+        self.destination_data = []
+
+    def get_destination_data(self):
+        # 2. Use the Sheety API to GET all the data in that sheet and print it out.
+        response = requests.get(url=SHEETY_PRICES_ENDPOINT, auth=self._authorization)
+        data = response.json()
+        self.destination_data = data["sheet1"]
+        #print(data)
+        return self.destination_data
+
+    # ==================== Updated the price in the spreadsheet ====================
+
+    def update_lowest_price(self, row_id, new_price):
+        new_data = {
+            "sheet1": {
+                "lowestPrice": new_price
+            }
+        }
+        requests.put(
+            url=f"{SHEETY_PRICES_ENDPOINT}/{row_id}",
+            json=new_data,
+            auth=self._authorization
+        )

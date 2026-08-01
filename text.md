@@ -1,52 +1,8 @@
-"""
-Flight price tracker script.
-
-Fetches destination airports from a Sheety spreadsheet, searches Google Flights
-through SerpAPI for available fares, and stores the cheapest flight found for
-each destination.
-
-The script currently performs the workflow directly during execution.
-"""
-
-import requests
-import serpapi
-import datetime
-import time
-
-# These modules are expected to support the full project workflow.
-# TODO: Confirm whether these imports are still required in this standalone flow.
-from data_manager import DataManager
-from flight_search import FlightSearch
-from notification_manager import NotificationManager
-
-
-# API and search configuration.
-# TODO: Move sensitive keys to environment variables before production use.
-SHEETY_ENDPOINT = "https://api.sheety.co/3bf8f403b513b361bbb26ef0ccfd53bd/flightPrices/sheet1"
-SERPAPI_KEY = "0da89cc1ad1aad2ce8410c00e1ae216d7c9f47e9f35360983b270db9128f7097"
-DEPARTURE_CITY = "DFW"
-CURRENCY = "USD"
-
-# TODO: check todo
-# If Sheety authentication is enabled, this header can be passed with requests.
-"""
-headers = {
-    "Authorization": "Bearer YOUR_SHEETY_BEARER_TOKEN"
-}
-"""
-
-
-# Retrieve destination cities and airport codes from the spreadsheet.
-response = requests.get(SHEETY_ENDPOINT)
-response.raise_for_status()
-sheet_data = response.json().get("sheet1", [])
-
-
 # Define the date range used when searching for flights.
 # The current implementation searches from tomorrow until the configured end date.
 today = datetime.date.today()
 start_date = today + datetime.timedelta(days=1)
-end_date = start_date + datetime.timedelta(days=2)
+end_date = start_date + datetime.timedelta(days=3)
 
 
 def get_date_range(start, end):
@@ -139,3 +95,5 @@ for destination in sheet_data:
 
 print("--- FINAL SUMMARY ---")
 print(cheapest_prices)
+
+
