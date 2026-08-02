@@ -39,7 +39,7 @@ pprint(sheet_data)
 
 flight_search = FlightSearch()
 # Create an instance of the NotificationManager
-notification_manager = NotificationManager()
+#notification_manager = NotificationManager()
 
 
 

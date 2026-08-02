@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-SHEETY_PRICES_ENDPOINT = "https://api.sheety.co/3bf8f403b513b361bbb26ef0ccfd53bd/flightPrices/sheet1"
+SHEETY_PRICES_ENDPOINT = "https://api.sheety.co/3bf8f403b513b361bbb26ef0ccfd53bd/flightPrices/prices"
 
 
 class DataManager:
@@ -21,7 +21,7 @@ class DataManager:
         # 2. Use the Sheety API to GET all the data in that sheet and print it out.
         response = requests.get(url=SHEETY_PRICES_ENDPOINT, auth=self._authorization)
         data = response.json()
-        self.destination_data = data["sheet1"]
+        self.destination_data = data["prices"]
         #print(data)
         return self.destination_data
 
