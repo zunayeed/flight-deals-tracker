@@ -34,8 +34,9 @@ sheet_data = data_manager.get_destination_data()
 
 # 5. Try importing pretty print and printing the data out again using pprint() to see it formatted.
 # Print the sheet_data and verify that it includes the airport IATA codes for each city.
+pprint("##### sheet_data from main.py #####")
 pprint(sheet_data)
-
+#[{'city': 'Dhaka', 'iataCode': 'DAC', 'id': 2, 'lowestPrice': 450}]
 
 flight_search = FlightSearch()
 # Create an instance of the NotificationManager
@@ -48,7 +49,8 @@ flight_search = FlightSearch()
 # ==================== Set the Dates ====================
 
 start_date = datetime.now() + timedelta(days=5)
-end_date = start_date + timedelta(days=20)
+end_date = start_date + timedelta(days=180)
+ORIGIN_CITY_IATA = "DFW"  # dallas
 
 #tomorrow = datetime.now() + timedelta(days=1)
 #six_month_from_today = datetime.now() + timedelta(days=(6 * 30))
@@ -65,15 +67,37 @@ flights = flight_search.check_flights(
     to_time=end_date
 )
 
+for destination in sheet_data:
+    pprint(f"Getting direct flights for {destination['city']}...")
+    flights = flight_search.check_flights(
+        ORIGIN_CITY_IATA,
+        destination["iataCode"],
+        from_time=start_date,
+        to_time=end_date
+    )
+
 #pprint(flights)
 
 # ==================== Show the Cheapest Flight ====================
 
-cheapest_flight = find_cheapest_flight(flights, return_date=end_date.strftime("%Y-%m-%d"))
-pprint(f"{sheet_data[0]['city']}: USD {cheapest_flight.price}")
+    cheapest_flight = find_cheapest_flight(flights, return_date=end_date.strftime("%Y-%m-%d"))
+    pprint(f"{sheet_data[0]['city']}: USD {cheapest_flight.price}")
 
-if cheapest_flight.price != "N/A" and cheapest_flight.price < sheet_data[0]["lowestPrice"]:
-    pprint(f"Lower price flight found to {sheet_data[0]['city']}!")
+    if cheapest_flight.price == "N/A":
+        print(f"No direct flight to {destination['city']}. Looking for indirect flights...")
+        stopover_flights = flight_search.check_flights(
+            ORIGIN_CITY_IATA,
+            destination["iataCode"],
+            from_time= start_date,
+            to_time=end_date,
+            is_direct=False
+        )
+        cheapest_flight = find_cheapest_flight(stopover_flights, return_date=end_date.strftime("%Y-%m-%d"))
+        print(f"Cheapest indirect flight price is: USD {cheapest_flight.price}")
+
+
+
+
     data_manager.update_lowest_price(sheet_data[0]["id"], cheapest_flight.price)
     # notification_manager.send_sms(
     #     message_body=f"Low price alert! Only GBP {cheapest_flight.price} to fly "

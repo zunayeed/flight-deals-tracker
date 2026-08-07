@@ -2,11 +2,12 @@ import os
 import requests
 from requests.auth import HTTPBasicAuth
 from dotenv import load_dotenv
+from pprint import pprint
 
 # Load environment variables from .env file
 load_dotenv()
 
-SHEETY_PRICES_ENDPOINT = "https://api.sheety.co/3bf8f403b513b361bbb26ef0ccfd53bd/flightPrices/prices"
+SHEETY_PRICES_ENDPOINT = os.environ["SHEETY_PRICES_ENDPOINT"]
 
 
 class DataManager:
@@ -22,7 +23,8 @@ class DataManager:
         response = requests.get(url=SHEETY_PRICES_ENDPOINT, auth=self._authorization)
         data = response.json()
         self.destination_data = data["prices"]
-        #print(data)
+        print("##### datamanager data: destination_data#########")
+        pprint(self.destination_data)
         return self.destination_data
 
     # ==================== Updated the price in the spreadsheet ====================

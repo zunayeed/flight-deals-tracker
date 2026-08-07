@@ -1,36 +1,45 @@
-from dataclasses import dataclass
-
-
-@dataclass
 class FlightData:
-    price: float | str
-    origin_airport: str
-    destination_airport: str
-    out_date: str
-    return_date: str
 
-    @classmethod
-    def from_api(cls, flight_dict: dict, return_date: str):
-        """Helper to instantiate FlightData directly from a raw flight dictionary."""
-        first_leg = flight_dict["flights"][0]
-        last_leg = flight_dict["flights"][-1]
-
-        return cls(
-            price=flight_dict["price"],
-            origin_airport=first_leg["departure_airport"]["id"],
-            destination_airport=last_leg["arrival_airport"]["id"],
-            out_date=first_leg["departure_airport"]["time"].split(" ")[0],
-            return_date=return_date
-        )
+    def __init__(self, price, origin_airport, destination_airport, out_date, return_date, stops):
+        self.price = price
+        self.origin_airport = origin_airport
+        self.destination_airport = destination_airport
+        self.out_date = out_date
+        self.return_date = return_date
+        self.stops = stops
 
 
-def find_cheapest_flight(data: dict, return_date: str) -> FlightData:
-    all_flights = (data.get("best_flights", []) + data.get("other_flights", [])) if data else []
-    valid_flights = [f for f in all_flights if "price" in f]
-
-    if not valid_flights:
+def find_cheapest_flight(data, return_date):
+    if data is None or (not data.get("best_flights") and not data.get("other_flights")):
         print("No flight data")
-        return FlightData("N/A", "N/A", "N/A", "N/A", "N/A")
+        return FlightData("N/A", "N/A", "N/A", "N/A", "N/A", "N/A")
 
-    cheapest = min(valid_flights, key=lambda f: f["price"])
-    return FlightData.from_api(cheapest, return_date)
+    all_flights = data.get("best_flights", []) + data.get("other_flights", [])
+
+    first_flight = all_flights[0]
+    lowest_price = first_flight["price"]
+    origin = first_flight["flights"][0]["departure_airport"]["id"]
+    destination = first_flight["flights"][-1]["arrival_airport"]["id"]
+    out_date = first_flight["flights"][0]["departure_airport"]["time"].split(" ")[0]
+
+    # A flight with 2 segments will have 1 stop
+    nr_stops = len(first_flight["flights"]) - 1
+
+    cheapest_flight = FlightData(lowest_price, origin, destination, out_date, return_date, nr_stops)
+
+    for flight in all_flights:
+        try:
+            price = flight["price"]
+        except KeyError:
+            print("--- No price available for flight. ---")
+            continue
+        if price < lowest_price:
+            lowest_price = price
+            origin = flight["flights"][0]["departure_airport"]["id"]
+            destination = flight["flights"][-1]["arrival_airport"]["id"]
+            out_date = flight["flights"][0]["departure_airport"]["time"].split(" ")[0]
+            nr_stops = len(flight["flights"]) - 1
+            cheapest_flight = FlightData(lowest_price, origin, destination, out_date, return_date, nr_stops)
+            print(f"Lowest price to {destination} is USD {lowest_price}")
+
+    return cheapest_flight
